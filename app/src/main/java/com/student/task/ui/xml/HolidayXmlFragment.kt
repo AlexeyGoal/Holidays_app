@@ -1,6 +1,7 @@
 package com.student.task.ui.xml
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,6 +31,7 @@ class HolidayXmlFragment : Fragment() {
         onFavoriteClick = { holidayId -> viewModel.toggleFavorite(holidayId) }
     )
 
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -43,6 +45,22 @@ class HolidayXmlFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         observeState()
+
+        binding.retryButton.setOnClickListener {
+            viewModel.retry()
+        }
+
+        binding.swipeRefresh.setOnRefreshListener{
+            viewModel.setRefreshing(true)
+            viewModel.retry()
+
+        }
+
+        binding.chipGroup.setOnCheckedStateChangeListener { group, ints ->
+            val checkedId = ints.firstOrNull()
+            viewModel.filterHolidays(checkedId)
+        }
+
     }
 
     private fun setupRecyclerView() {
@@ -70,10 +88,12 @@ class HolidayXmlFragment : Fragment() {
                         is ScreenState.Loading -> showLoading()
                         is ScreenState.Error -> showError(state.message)
                         is ScreenState.Data -> showData(state)
+                        is ScreenState.Refreshing -> {}
                     }
                 }
             }
         }
+
     }
 
     private fun showLoading() {
@@ -85,18 +105,30 @@ class HolidayXmlFragment : Fragment() {
     private fun showError(message: String) {
         binding.recyclerView.visibility = View.GONE
         binding.loadingLayout.visibility = View.GONE
+
         binding.errorLayout.visibility = View.VISIBLE
 
         binding.errorMessage.text = message
     }
 
     private fun showData(state: ScreenState.Data) {
+        binding.swipeRefresh.isRefreshing = false
         binding.loadingLayout.visibility = View.GONE
         binding.errorLayout.visibility = View.GONE
+        if (state.holidays.isEmpty()){
+            binding.recyclerView.visibility = View.GONE
+            showEmpty()
+            return
+        }
+        binding.emptyListLayout.visibility = View.GONE
         binding.recyclerView.visibility = View.VISIBLE
-
         adapter.submitHolidays(state.holidays, state.isLoadingMore)
     }
+
+    private fun showEmpty(){
+        binding.emptyListLayout.visibility = View.VISIBLE
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -23,4 +23,6 @@ sealed class ScreenState {
         val hasMorePages: Boolean,
         val currentPage: Int
     ) : ScreenState()
+
+    data object Refreshing: ScreenState()
 }

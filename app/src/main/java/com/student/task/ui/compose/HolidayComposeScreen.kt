@@ -83,6 +83,8 @@ fun HolidayComposeScreen() {
                         onLoadMore = { viewModel.loadNextPage() }
                     )
                 }
+
+                is ScreenState.Refreshing -> {}
             }
         }
     }

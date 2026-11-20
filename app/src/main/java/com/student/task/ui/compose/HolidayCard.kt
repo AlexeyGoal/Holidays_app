@@ -52,6 +52,14 @@ fun HolidayCard(
                 modifier = modifier
             )
         }
+
+        CardState.FavoriteExpanded -> {
+            DefaultHolidayCard(
+                uiModel = uiModel,
+                onClick = onClick,
+                modifier = modifier
+            )
+        }
     }
 }
 

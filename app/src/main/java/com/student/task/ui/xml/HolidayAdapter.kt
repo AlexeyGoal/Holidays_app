@@ -1,11 +1,17 @@
 package com.student.task.ui.xml
 
+import android.content.Context
+import android.content.res.ColorStateList
+import android.transition.TransitionManager
+import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.student.task.R
 import com.student.task.databinding.ItemHolidayCardBinding
 import com.student.task.databinding.ItemLoadingMoreBinding
 import com.student.task.presentation.model.CardState
@@ -53,6 +59,8 @@ class HolidayAdapter(
             }
             else -> throw IllegalArgumentException("Unknown view type: $viewType")
         }
+
+
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -74,9 +82,14 @@ class HolidayAdapter(
             binding.holidayName.text = holiday.name
             binding.holidayDate.text = holiday.date
             binding.officialBadge.visibility = if (holiday.isOfficial) View.VISIBLE else View.GONE
+            binding.description.text = holiday.description
 
             binding.cardRoot.setOnClickListener {
                 onCardClick(holiday.id)
+            }
+
+            binding.favoriteIcon.setOnClickListener {
+                onFavoriteClick(holiday.id)
             }
 
             when (uiModel.cardState) {
@@ -84,15 +97,70 @@ class HolidayAdapter(
                     bindDefault()
                 }
                 CardState.Expanded -> {
-                    bindDefault()
+                    bindExpanded()
                 }
                 CardState.Favorite -> {
-                    bindDefault()
+                    bindFavorite()
+                }
+
+                CardState.FavoriteExpanded -> {
+                    bindFavoriteExpanded()
                 }
             }
         }
 
-        private fun bindDefault() {}
+        private fun bindDefault() {
+            TransitionManager.beginDelayedTransition(
+                binding.cardRoot as ViewGroup
+            )
+            binding.description.visibility = View.GONE
+            binding.cardRoot.setCardBackgroundColor(ContextCompat.getColor(binding.root.context,R.color.white))
+            binding.favoriteIcon.imageTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(binding.root.context, R.color.gray)
+            )
+        }
+
+        private fun bindFavorite(){
+            TransitionManager.beginDelayedTransition(
+                binding.cardRoot as ViewGroup
+            )
+            binding.description.visibility = View.GONE
+            binding.cardRoot.setCardBackgroundColor(ContextCompat.getColor(binding.root.context,R.color.favorite))
+            binding.favoriteIcon.imageTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(binding.root.context, R.color.red)
+            )
+        }
+
+        private fun bindExpanded(){
+            TransitionManager.beginDelayedTransition(
+                binding.cardRoot as ViewGroup
+            )
+            binding.description.visibility = View.VISIBLE
+
+            binding.cardRoot.setCardBackgroundColor(ContextCompat.getColor(binding.root.context,R.color.white))
+            binding.favoriteIcon.imageTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(binding.root.context, R.color.gray)
+            )
+
+
+        }
+
+        private fun bindFavoriteExpanded(){
+            TransitionManager.beginDelayedTransition(
+                binding.cardRoot as ViewGroup
+            )
+            binding.description.visibility = View.VISIBLE
+
+            binding.cardRoot.setCardBackgroundColor(ContextCompat.getColor(binding.root.context,R.color.favorite))
+            binding.favoriteIcon.imageTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(binding.root.context, R.color.red)
+            )
+
+
+        }
+
+
+
 
     }
 

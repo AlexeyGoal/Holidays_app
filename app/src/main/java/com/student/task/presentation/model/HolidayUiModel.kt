@@ -4,5 +4,6 @@ import com.student.task.domain.model.Holiday
 
 data class HolidayUiModel(
     val holiday: Holiday,
-    val cardState: CardState = CardState.Default
+    val cardState: CardState = CardState.Default,
+
 )
